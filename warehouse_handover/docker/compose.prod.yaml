@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-warehouse}
+      POSTGRES_USER: ${POSTGRES_USER:-warehouse_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-WarehouseSecret_2026!}
+    volumes:
+      - warehouse_pgdata:/var/lib/postgresql/data
+      - ../database/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+      - ../database/002_seed_geometry.sql:/docker-entrypoint-initdb.d/002_seed_geometry.sql:ro
+      - ../database/003_operations.sql:/docker-entrypoint-initdb.d/003_operations.sql:ro
+      - ../database/004_guards.sql:/docker-entrypoint-initdb.d/004_guards.sql:ro
+      - ../database/005_reservations.sql:/docker-entrypoint-initdb.d/005_reservations.sql:ro
+      - ../database/006_item_metadata.sql:/docker-entrypoint-initdb.d/006_item_metadata.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      WAREHOUSE_USE_POSTGRES: "1"
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-warehouse}
+      POSTGRES_USER: ${POSTGRES_USER:-warehouse_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-WarehouseSecret_2026!}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  adminer:
+    image: adminer:4
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  warehouse_pgdata:
