@@ -1,0 +1,21 @@
+flowchart TD
+ A[Quản trị nhập khách và diện tích thuê] --> B[Tính N = ceil S x 0.70 / 5.6]
+ B --> C[Đề xuất các ô từ trái sang phải: mã ô giảm dần trên dãy 101-124]
+ C --> D{Quản trị xác nhận phân khu?}
+ D -->|Không| E[Kết thúc không thay đổi DB]
+ D -->|Có| F[Transaction: khóa ô, kiểm tra chống cấp trùng]
+ F --> G{Đủ điều kiện?}
+ G -->|Không| H[Rollback và đề xuất lại]
+ G -->|Có| I[Ghi lease và bay_assignments]
+ I --> J[Khách nhập Excel hoặc nhập thủ công]
+ J --> K[Tính pallet đơn/đơn nhô/đôi/gỗ thô/quá khổ]
+ K --> L[Lọc vùng thuê, tải, khóa tầng 1-3 của 69 ô đặc biệt]
+ L --> M[Ưu tiên: Tầng hợp lệ -> Dãy 101-124 -> Mã ô giảm dần -> Slot chẵn/lẻ]
+ M --> N{Người dùng xác nhận lưu kho?}
+ N -->|Không| O[Giữ ở trạng thái đề xuất]
+ N -->|Có| P[Transaction khóa và kiểm tra lại]
+ P --> Q{Còn hợp lệ?}
+ Q -->|Không| R[Rollback, báo xung đột]
+ Q -->|Có| S[Ghi pallet, occupied_slots, audit]
+ S --> T[Cập nhật bảng vị trí và mô hình 2D/3D]
+

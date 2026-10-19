@@ -1,0 +1,26 @@
+erDiagram
+ TENANTS ||--o{ USERS_APP : has
+ TENANTS ||--o{ LEASES : rents
+ TENANTS ||--o{ SKUS : owns
+ TENANTS ||--o{ INBOUND_ORDERS : receives
+ TENANTS ||--o{ PALLETS : owns
+ RACKS ||--|{ BAYS : holds
+ BAYS ||--|{ RACK_SLOTS : has
+ LEASES ||--o{ BAY_ASSIGNMENTS : grants
+ BAYS ||--o{ BAY_ASSIGNMENTS : allocated
+ INBOUND_ORDERS ||--|{ INBOUND_LINES : includes
+ SKUS ||--o{ INBOUND_LINES : describes
+ INBOUND_LINES ||--o{ PALLETS : creates
+ SKUS ||--o{ PALLETS : only_one_sku
+ PALLETS ||--o{ PALLET_PLACEMENTS : placed
+ BAYS ||--o{ PALLET_PLACEMENTS : located
+ PALLET_PLACEMENTS ||--|{ OCCUPIED_SLOTS : occupies
+ RACK_SLOTS ||--o| OCCUPIED_SLOTS : active_holder
+ TENANTS ||--o{ PROPOSALS : creates
+ PROPOSALS ||--o{ SLOT_RESERVATIONS : holds
+ INBOUND_ORDERS ||--o{ SLOT_RESERVATIONS : reserves
+ RACK_SLOTS ||--o{ SLOT_RESERVATIONS : temporarily_reserved
+ USERS_APP ||--o{ AUDIT_EVENTS : acts
+ TENANTS ||--o{ OUTBOUND_ORDERS : ships
+ OUTBOUND_ORDERS ||--|{ OUTBOUND_LINES : includes
+ PALLETS ||--o{ PALLET_MOVEMENTS : audit_trail

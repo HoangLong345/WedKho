@@ -1,0 +1,2 @@
+ALTER TABLE skus
+  ADD COLUMN IF NOT EXISTS unit_of_measure TEXT NOT NULL DEFAULT 'case';
